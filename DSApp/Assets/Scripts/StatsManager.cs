@@ -44,6 +44,8 @@ public class StatsManager : MonoBehaviour {
     public Button Next;
     public Button Prev;
     public Button BackStats;
+	public GameObject StatScrollView;
+	public GameObject StatScrollbar;
 
     public Text[] GameStats1;
     public Text[] GameStats2;
@@ -51,6 +53,8 @@ public class StatsManager : MonoBehaviour {
     public Text[] GameStats4;
     public Text[] GameStats5;
     public Text[] GameStats6;
+	public Text[] GameStats7;
+	public Text[] GameStats8;
 
     public Slider[] Bars;
     public Text[] TextBars;
@@ -190,12 +194,17 @@ public class StatsManager : MonoBehaviour {
         {
             case 0:
                 {
+					StatScrollView.gameObject.SetActive(true);
+					StatScrollbar.GetComponent<Scrollbar>().interactable = true;
+					StatScrollbar.transform.GetChild(0).GetChild(0).gameObject.SetActive(true);
                     MiniGameButton[0].gameObject.SetActive(true);
                     MiniGameButton[1].gameObject.SetActive(true);
                     MiniGameButton[2].gameObject.SetActive(true);
                     MiniGameButton[3].gameObject.SetActive(true);
                     MiniGameButton[4].gameObject.SetActive(true);
 					MiniGameButton[5].gameObject.SetActive(true);
+					MiniGameButton[6].gameObject.SetActive(true);
+					MiniGameButton[7].gameObject.SetActive(false);
 
                     MiniGameButton[0].onClick.RemoveAllListeners();
                     MiniGameButton[1].onClick.RemoveAllListeners();
@@ -203,6 +212,8 @@ public class StatsManager : MonoBehaviour {
                     MiniGameButton[3].onClick.RemoveAllListeners();
                     MiniGameButton[4].onClick.RemoveAllListeners();
 					MiniGameButton[5].onClick.RemoveAllListeners();
+					MiniGameButton[6].onClick.RemoveAllListeners();
+					MiniGameButton[7].onClick.RemoveAllListeners();
 
                     MiniGameButton[0].onClick.AddListener(delegate { selectDetStat(0); });
 					MiniGameButton[1].onClick.AddListener(delegate { selectDetStat(11);}); //Grapheme Clouds
@@ -210,8 +221,9 @@ public class StatsManager : MonoBehaviour {
                     MiniGameButton[3].onClick.AddListener(delegate { selectDetStat(3); });
                     MiniGameButton[4].onClick.AddListener(delegate { selectDetStat(4); });
 					MiniGameButton[5].onClick.AddListener(delegate { selectDetStat(1); });
+					MiniGameButton[6].onClick.AddListener(delegate { selectDetStat(12);}); //Inverted Grapheme Search
                     
-                    MacroCat.text = "Fonologici";      
+                    MacroCat.text = "Fonologici";
 
                     MiniGameName[0].text = "Omiss/Agg Grafema Immagini";
                     GameStats1[0].text = "Errori ultima sessione: " + db.getStat("GraphemePic", "LastError", kids[statsChoice.value]);
@@ -248,14 +260,25 @@ public class StatsManager : MonoBehaviour {
 					GameStats6[1].text = "Tempo ultima sessione: " + (float.Parse(db.getStat("InvertedGrapheme", "LastTime", kids[statsChoice.value])).ToString("n2") + "s");
 					GameStats6[2].text = "Tempo totale giocato: " + (float.Parse(db.getStat("InvertedGrapheme", "TotalTime", kids[statsChoice.value])).ToString("n2") + "s");
 					GameStats6[3].text = "";
+
+					MiniGameName[6].text = "Inversione Grafemi Ricerca";
+					GameStats7[0].text = "Errori ultima sessione: " + db.getStat("InvertedGraphemeSearch", "LastError", kids[statsChoice.value]);
+					GameStats7[1].text = "Tempo ultima sessione: " + (float.Parse(db.getStat("InvertedGraphemeSearch", "LastTime", kids[statsChoice.value])).ToString("n2") + "s");
+					GameStats7[2].text = "Tempo totale giocato: " + (float.Parse(db.getStat("InvertedGraphemeSearch", "TotalTime", kids[statsChoice.value])).ToString("n2") + "s");
+					GameStats7[3].text = "";
 						
                     break;
                 }
             case 1:
                 {
-
-                    MiniGameButton[5].gameObject.SetActive(false);
+					StatScrollView.gameObject.SetActive(true);
+					StatScrollView.GetComponentInChildren<ScrollRect>().verticalNormalizedPosition = 1f;
+					StatScrollbar.GetComponent<Scrollbar>().interactable = false;
+					StatScrollbar.transform.GetChild(0).GetChild(0).gameObject.SetActive(false);
                     MiniGameButton[4].gameObject.SetActive(false);
+                    MiniGameButton[5].gameObject.SetActive(false);
+					MiniGameButton[6].gameObject.SetActive(false);
+					MiniGameButton[7].gameObject.SetActive(false);
                     
                     MiniGameButton[0].gameObject.SetActive(true);
                     MiniGameButton[1].gameObject.SetActive(true);
@@ -302,11 +325,16 @@ public class StatsManager : MonoBehaviour {
                 }
             case 2:
                 {
-
+					StatScrollView.gameObject.SetActive(true);
+					StatScrollView.GetComponentInChildren<ScrollRect>().verticalNormalizedPosition = 1f;
+					StatScrollbar.GetComponent<Scrollbar>().interactable = false;
+					StatScrollbar.transform.GetChild(0).GetChild(0).gameObject.SetActive(false);
                     MiniGameButton[2].gameObject.SetActive(false);
                     MiniGameButton[3].gameObject.SetActive(false);
                     MiniGameButton[4].gameObject.SetActive(false);
                     MiniGameButton[5].gameObject.SetActive(false);
+					MiniGameButton[6].gameObject.SetActive(false);
+					MiniGameButton[7].gameObject.SetActive(false);
 
                     MiniGameButton[0].gameObject.SetActive(true);
                     MiniGameButton[1].gameObject.SetActive(true);
@@ -752,6 +780,12 @@ public class StatsManager : MonoBehaviour {
 					DetStat(kidN, "GraphemeClouds");
 					break;
 				}
+			case 12:
+				{
+					MacroCat.text = "Inversione Grafemi Ricerca";
+					DetStat(kidN, "InvertedGraphemeSearch");
+					break;
+				}
         }
         //setBars();
     }
@@ -764,6 +798,7 @@ public class StatsManager : MonoBehaviour {
         MiniGameButton[5].gameObject.SetActive(false);
         MiniGameButton[3].gameObject.SetActive(false);
         MiniGameButton[4].gameObject.SetActive(false);
+		StatScrollView.gameObject.SetActive (false);
 
         rows = db.countDetStat(username, game);
 
