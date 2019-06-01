@@ -204,7 +204,7 @@ public class StatsManager : MonoBehaviour {
                     MiniGameButton[4].gameObject.SetActive(true);
 					MiniGameButton[5].gameObject.SetActive(true);
 					MiniGameButton[6].gameObject.SetActive(true);
-					MiniGameButton[7].gameObject.SetActive(false);
+					MiniGameButton[7].gameObject.SetActive(true);
 
                     MiniGameButton[0].onClick.RemoveAllListeners();
                     MiniGameButton[1].onClick.RemoveAllListeners();
@@ -220,8 +220,9 @@ public class StatsManager : MonoBehaviour {
                     MiniGameButton[2].onClick.AddListener(delegate { selectDetStat(2); });
                     MiniGameButton[3].onClick.AddListener(delegate { selectDetStat(3); });
                     MiniGameButton[4].onClick.AddListener(delegate { selectDetStat(4); });
-					MiniGameButton[5].onClick.AddListener(delegate { selectDetStat(1); });
-					MiniGameButton[6].onClick.AddListener(delegate { selectDetStat(12);}); //Inverted Grapheme Search
+					MiniGameButton[5].onClick.AddListener(delegate { selectDetStat(13);}); //SoundImages
+					MiniGameButton[6].onClick.AddListener(delegate { selectDetStat(1); });
+					MiniGameButton[7].onClick.AddListener(delegate { selectDetStat(12);}); //Inverted Grapheme Search
                     
                     MacroCat.text = "Fonologici";
 
@@ -255,17 +256,23 @@ public class StatsManager : MonoBehaviour {
                     GameStats5[2].text = "Tempo totale giocato: " + (float.Parse(db.getStat("PBGrapheme", "TotalTime", kids[statsChoice.value])).ToString("n2") + "s");
                     GameStats5[3].text = "";
 
-					MiniGameName[5].text = "Inversione Grafemi";
-					GameStats6[0].text = "Errori ultima sessione: " + db.getStat("InvertedGrapheme", "LastError", kids[statsChoice.value]);
-					GameStats6[1].text = "Tempo ultima sessione: " + (float.Parse(db.getStat("InvertedGrapheme", "LastTime", kids[statsChoice.value])).ToString("n2") + "s");
-					GameStats6[2].text = "Tempo totale giocato: " + (float.Parse(db.getStat("InvertedGrapheme", "TotalTime", kids[statsChoice.value])).ToString("n2") + "s");
+					MiniGameName[5].text = "Sostituzione Grafema Ricerca Suono";
+					GameStats6[0].text = "Errori ultima sessione: " + db.getStat("SoundImages", "LastError", kids[statsChoice.value]);
+					GameStats6[1].text = "Tempo ultima sessione: " + (float.Parse(db.getStat("SoundImages", "LastTime", kids[statsChoice.value])).ToString("n2") + "s");
+					GameStats6[2].text = "Tempo totale giocato: " + (float.Parse(db.getStat("SoundImages", "TotalTime", kids[statsChoice.value])).ToString("n2") + "s");
 					GameStats6[3].text = "";
 
-					MiniGameName[6].text = "Inversione Grafemi Ricerca";
-					GameStats7[0].text = "Errori ultima sessione: " + db.getStat("InvertedGraphemeSearch", "LastError", kids[statsChoice.value]);
-					GameStats7[1].text = "Tempo ultima sessione: " + (float.Parse(db.getStat("InvertedGraphemeSearch", "LastTime", kids[statsChoice.value])).ToString("n2") + "s");
-					GameStats7[2].text = "Tempo totale giocato: " + (float.Parse(db.getStat("InvertedGraphemeSearch", "TotalTime", kids[statsChoice.value])).ToString("n2") + "s");
+					MiniGameName[6].text = "Inversione Grafemi Coppie";
+					GameStats7[0].text = "Errori ultima sessione: " + db.getStat("InvertedGrapheme", "LastError", kids[statsChoice.value]);
+					GameStats7[1].text = "Tempo ultima sessione: " + (float.Parse(db.getStat("InvertedGrapheme", "LastTime", kids[statsChoice.value])).ToString("n2") + "s");
+					GameStats7[2].text = "Tempo totale giocato: " + (float.Parse(db.getStat("InvertedGrapheme", "TotalTime", kids[statsChoice.value])).ToString("n2") + "s");
 					GameStats7[3].text = "";
+
+					MiniGameName[7].text = "Inversione Grafemi Ricerca";
+					GameStats8[0].text = "Errori ultima sessione: " + db.getStat("InvertedGraphemeSearch", "LastError", kids[statsChoice.value]);
+					GameStats8[1].text = "Tempo ultima sessione: " + (float.Parse(db.getStat("InvertedGraphemeSearch", "LastTime", kids[statsChoice.value])).ToString("n2") + "s");
+					GameStats8[2].text = "Tempo totale giocato: " + (float.Parse(db.getStat("InvertedGraphemeSearch", "TotalTime", kids[statsChoice.value])).ToString("n2") + "s");
+					GameStats8[3].text = "";
 						
                     break;
                 }
@@ -784,6 +791,12 @@ public class StatsManager : MonoBehaviour {
 				{
 					MacroCat.text = "Inversione Grafemi Ricerca";
 					DetStat(kidN, "InvertedGraphemeSearch");
+					break;
+				}
+			case 13:
+				{
+					MacroCat.text = "Scambio Grafema Ricerca Suono";
+					DetStat(kidN, "SoundImages");
 					break;
 				}
         }

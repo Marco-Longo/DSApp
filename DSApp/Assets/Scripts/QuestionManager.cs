@@ -113,14 +113,26 @@ public class QuestionManager : MonoBehaviour {
 	public Text sg_question;
 	public GameObject sg_matrix;
 	public Button[] sg_buttons;
-	public int sg_correctAnswers;
-	public int sg_counter;
+	private int sg_correctAnswers;
+	private int sg_counter;
 
     //GraphemeExchg
     public Button ge_answerA;
     public Button ge_answerB;
     public Button ge_next;
     string ge_type;
+
+	//SoundImages
+	public Button si_next;
+	public Text si_question;
+	public Image[] si_images;
+	public Sprite[] si_sprites;
+	public Sprite si_correct;
+	public Sprite si_wrong;
+	private string si_qstType;
+	private string si_sound;
+	private int si_correctAnswers;
+	private int si_counter;
 
     //flags
     bool correct;
@@ -153,6 +165,7 @@ public class QuestionManager : MonoBehaviour {
 		GameObject.FindWithTag("InvertedGraphemeSearch").SetActive(false);
 		GameObject.FindWithTag("SentenceSplit").SetActive(false);
         GameObject.FindWithTag("GraphemeExchange").SetActive(false);
+		GameObject.FindWithTag("SoundImages").SetActive(false);
 
         timecalled = 0;
     }
@@ -393,6 +406,22 @@ public class QuestionManager : MonoBehaviour {
 					
 					break;
 				}
+
+			case "SoundImages":
+				{
+					GO.SetActive(true);
+					questionTxt.text = "";
+					
+					q_id = getNewQuestion();
+					si_next.onClick.AddListener(si_nextQuestion);
+
+					str = db.getQuestion(q_id, q_type, true);
+					answer = str[1]; //request+sound
+					si_generateQuestion();
+					si_fillArray(str[0]);
+
+					break;
+				}
             default:
                 {
                     break;
@@ -482,7 +511,6 @@ public class QuestionManager : MonoBehaviour {
             result.text = "";
             ss_btnSend.interactable = true;
             active = true;
-//            ss_answerTxt.text = answer;
 
             ss_btnSend.gameObject.SetActive(true);
             ss_btnNext.gameObject.SetActive(false);
@@ -1827,6 +1855,188 @@ public class QuestionManager : MonoBehaviour {
 				db.updateStat("InvertedGraphemeSearch", "LastTime", mainTimer.ToString(), player);
 				db.updateStat("InvertedGraphemeSearch", "TotalTime", (float.Parse(db.getStat("InvertedGraphemeSearch", "TotalTime", player)) + mainTimer).ToString(), player);
 				db.addStat(player, "InvertedGraphemeSearch", DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss").ToString(), wrongAnsw.ToString(), errorCount.ToString(), (5 - wrongAnsw).ToString(), mainTimer.ToString(), "0");
+			}
+
+			btnMenu.transform.position = new Vector3(Screen.width / 2, Screen.height / 2 - 30f, 0f);
+		}
+	}
+
+	//SoundImages
+	public void si_generateQuestion()
+	{
+		si_qstType = answer.Substring (0, answer.IndexOf ("+"));
+		si_sound = answer.Substring(answer.IndexOf("+")+1, 1);
+		si_correctAnswers = 0;
+		si_counter = 0;
+
+		if (si_qstType == "starts")
+			si_question.text = "Seleziona le figure che iniziano con il suono " + si_sound;
+		else if (si_qstType == "contains")
+			si_question.text = "Seleziona le figure che contengono il suono " + si_sound;
+		else
+			si_question.text = "Seleziona le figure con il suono " + si_sound;
+	}
+
+	public void si_fillArray(string imgNames)
+	{
+		char[] words = imgNames.ToCharArray();
+		int c_idx = 0;
+
+		for (int i = 0; i < si_images.Length; i++) 
+		{
+			while (words[c_idx] != '+')
+				si_images [i].transform.GetChild(0).GetComponent<Text>().text += words[c_idx++];
+			if (i < si_images.Length - 2)
+				c_idx++;
+			if (i == si_images.Length - 1)
+				si_images [i].transform.GetChild(0).GetComponent<Text>().text = imgNames.Substring (++c_idx);
+			si_attachSprite(i, si_images[i].transform.GetChild(0).GetComponent<Text>().text.ToLower());
+			si_updateCounter(si_images[i].transform.GetChild(0).GetComponent<Text>().text);
+
+			si_images [i].gameObject.SetActive (true);
+			int _i = i;
+			si_images [i].GetComponent<Button> ().onClick.AddListener (delegate {si_assignBehaviour(_i);});
+		}
+	}
+
+	public void si_attachSprite(int idx, string img)
+	{
+		for(int i = 0; i < si_sprites.Length; i++)
+			if (si_sprites [i].name == img) 
+			{
+				si_images [idx].GetComponent<Image> ().sprite = si_sprites [i];
+				break;
+			}
+	}
+
+	public void si_updateCounter(string img)
+	{
+		if (si_qstType == "starts") 
+		{
+			if (img [0] == si_sound [0])
+				si_correctAnswers++;
+		} 
+		else if (si_qstType == "contains") 
+		{
+			if (img.ToUpper ().Contains (si_sound))
+				si_correctAnswers++;	
+		}
+	}
+
+	public void si_assignBehaviour(int i)
+	{
+		if (si_qstType == "starts") 
+		{
+			if (si_images [i].transform.GetChild (0).GetComponent<Text> ().text [0] == si_sound [0]) //correct
+			{
+				si_images [i].transform.GetChild (1).GetComponent<Image> ().sprite = si_correct;
+				questionTxt.GetComponent<AudioSource> ().Play ();
+				si_counter++;
+				if (si_counter == si_correctAnswers)
+					si_checkResult ();
+			}
+			else //wrong
+			{
+				si_images [i].transform.GetChild (1).GetComponent<Image> ().sprite = si_wrong;
+				result.GetComponent<AudioSource> ().Play ();
+				errorTmp++;
+			}
+		} 
+		else if (si_qstType == "contains") 
+		{
+			if (si_images [i].transform.GetChild (0).GetComponent<Text> ().text.ToUpper ().Contains (si_sound)) //correct
+			{
+				si_images [i].transform.GetChild (1).GetComponent<Image> ().sprite = si_correct;
+				questionTxt.GetComponent<AudioSource> ().Play ();
+				si_counter++;
+				if (si_counter == si_correctAnswers)
+					si_checkResult ();
+			}
+			else //wrong
+			{
+				si_images [i].transform.GetChild (1).GetComponent<Image> ().sprite = si_wrong;
+				result.GetComponent<AudioSource> ().Play ();
+				errorTmp++;
+			}
+		}
+
+		si_images [i].transform.GetChild(0).gameObject.SetActive (true);
+		si_images [i].transform.GetChild(1).gameObject.SetActive (true);
+	}
+
+	public void si_checkResult()
+	{
+		if (si_counter != si_correctAnswers) 
+		{
+			result.text = "Devi prima trovare tutte le corrispondenze!";
+			return;
+		}
+
+		questionTxt.text = "Hai trovato tutte le corrispondenze!";
+		recordTime();
+		if(errorTmp > 0)
+			wrongAnsw++;
+
+		si_question.text = "";
+		si_next.gameObject.SetActive(true);
+		for (int i = 0; i < si_images.Length; i++)
+			si_images [i].gameObject.SetActive (false);
+
+		correct = true;
+		errorCount += errorTmp;
+		errorTmp = 0;
+	}
+
+	public void si_resetImages()
+	{
+		for (int i = 0; i < si_images.Length; i++) 
+		{
+			si_images [i].GetComponent<Image> ().sprite = null;
+			si_images [i].GetComponent<Button> ().onClick.RemoveAllListeners ();
+			si_images [i].transform.GetChild (0).GetComponent<Text> ().text = "";
+			si_images [i].transform.GetChild (1).GetComponent<Image> ().sprite = null;
+			si_images [i].transform.GetChild (0).gameObject.SetActive (false);
+			si_images [i].transform.GetChild (1).gameObject.SetActive (false);
+		}
+	}
+
+	public void si_nextQuestion()
+	{
+		checkCorrect();
+		si_next.gameObject.SetActive (false);
+		si_resetImages ();
+
+		if (toNext == true && index < 5) 
+		{
+			index++;
+			toNext = false;
+
+			q_id = getNewQuestion ();
+			str = db.getQuestion (q_id, q_type, true);
+			answer = str [1];
+			si_generateQuestion();
+			si_fillArray(str[0]);
+
+			errorTmp = 0;
+			active = true;
+			questionTxt.text = "";
+		}
+		else if (index < 5)
+			result.text = "Devi prima rispondere correttamente alla domanda!";
+		else
+		{
+			si_next.onClick.RemoveAllListeners();
+			GO.SetActive(false);
+
+			questionTxt.text = "Hai completato le domande! Torna al menù!";
+			result.text = "";
+
+			if (collect)
+			{
+				db.updateStat("SoundImages", "LastError", errorCount.ToString(), player);
+				db.updateStat("SoundImages", "LastTime", mainTimer.ToString(), player);
+				db.updateStat("SoundImages", "TotalTime", (float.Parse(db.getStat("SoundImages", "TotalTime", player)) + mainTimer).ToString(), player);
+				db.addStat(player, "SoundImages", DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss").ToString(), wrongAnsw.ToString(), errorCount.ToString(), (5 - wrongAnsw).ToString(), mainTimer.ToString(), "0");
 			}
 
 			btnMenu.transform.position = new Vector3(Screen.width / 2, Screen.height / 2 - 30f, 0f);

@@ -18,6 +18,7 @@ TagManager:
   - GraphemeExchange
   - GraphemeClouds
   - InvertedGraphemeSearch
+  - SoundImages
   layers:
   - Default
   - TransparentFX

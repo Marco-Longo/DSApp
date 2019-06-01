@@ -38,7 +38,7 @@ public class DBConnection : MonoBehaviour {
 
     void Start()
     {
-        games = new string[13];
+        games = new string[14];
 
         games[0]	=	"AccentGame";
         games[1]	=	"AudioGame";
@@ -53,6 +53,7 @@ public class DBConnection : MonoBehaviour {
         games[10]	=	"SentenceSplit";
 		games[11]	=	"GraphemeClouds";
 		games[12]	=	"InvertedGraphemeSearch";
+		games[13]	=	"SoundImages";
     }
 
     public string ss_getQuestion(int n)

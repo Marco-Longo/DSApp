@@ -176,6 +176,12 @@ public class MainMenu : MonoBehaviour {
 		PlayerPrefs.SetString("choice", "InvertedGraphemeSearch");
 		db.choice = "InvertedGraphemeSearch";
 	}
+	public void SoundImages_load()
+	{
+		SceneManager.LoadScene("3. QuestionTab");
+		PlayerPrefs.SetString("choice", "SoundImages");
+		db.choice = "SoundImages";
+	}
 
 	//public void menuSelection(int moveTo)
     //{
