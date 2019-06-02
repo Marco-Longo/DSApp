@@ -1775,6 +1775,7 @@ public class QuestionManager : MonoBehaviour {
 	{
 		for (int i = 0; i < sg_buttons.Length; i++) 
 		{
+			sg_buttons [i].GetComponent<Button> ().interactable = true;
 			sg_buttons [i].GetComponentInChildren<Text> ().text = "";
 			sg_buttons [i].GetComponent<Image> ().color = Color.white;
 		}
@@ -1782,6 +1783,7 @@ public class QuestionManager : MonoBehaviour {
 
 	public void sg_correctButton (int idx)
 	{
+		sg_buttons [idx].GetComponent<Button> ().interactable = false;
 		sg_buttons [idx].GetComponent<Image> ().color = Color.green;
 		questionTxt.GetComponent<AudioSource>().Play();
 		sg_counter++;
@@ -1791,6 +1793,7 @@ public class QuestionManager : MonoBehaviour {
 
 	public void sg_wrongButton(int idx)
 	{
+		sg_buttons [idx].GetComponent<Button> ().interactable = false;
 		sg_buttons [idx].GetComponent<Image> ().color = Color.red;
 		result.GetComponent<AudioSource> ().Play ();
 		errorTmp++;
@@ -1960,6 +1963,7 @@ public class QuestionManager : MonoBehaviour {
 			}
 		}
 
+		si_images [i].GetComponent<Button> ().interactable = false;
 		si_images [i].transform.GetChild(0).gameObject.SetActive (true);
 		si_images [i].transform.GetChild(1).gameObject.SetActive (true);
 	}
@@ -1997,6 +2001,7 @@ public class QuestionManager : MonoBehaviour {
 			si_images [i].transform.GetChild (1).GetComponent<Image> ().sprite = null;
 			si_images [i].transform.GetChild (0).gameObject.SetActive (false);
 			si_images [i].transform.GetChild (1).gameObject.SetActive (false);
+			si_images [i].GetComponent<Button> ().interactable = true;
 		}
 	}
 
@@ -2044,7 +2049,7 @@ public class QuestionManager : MonoBehaviour {
 	}
 
     //generic
-    int getNewQuestion()
+	int getNewQuestion()
     {
         timecalled++;
         int rnd = UnityEngine.Random.Range(1, total + 1);
