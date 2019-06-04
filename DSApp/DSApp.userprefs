@@ -4,9 +4,9 @@
     <Files>
       <File FileName="Assets\Scripts\GameManager.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\MainMenu.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\QuestionManager.cs" Line="2049" Column="3" />
+      <File FileName="Assets\Scripts\QuestionManager.cs" Line="1987" Column="3" />
       <File FileName="Assets\Scripts\DBConnection.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\StatsManager.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\StatsManager.cs" Line="615" Column="19" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

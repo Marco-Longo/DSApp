@@ -124,11 +124,13 @@ public class QuestionManager : MonoBehaviour {
 
 	//SoundImages
 	public Button si_next;
+	public Button si_audio;
 	public Text si_question;
 	public Image[] si_images;
 	public Sprite[] si_sprites;
 	public Sprite si_correct;
 	public Sprite si_wrong;
+	public AudioClip[] si_clips;
 	private string si_qstType;
 	private string si_sound;
 	private int si_correctAnswers;
@@ -1873,25 +1875,34 @@ public class QuestionManager : MonoBehaviour {
 		si_counter = 0;
 
 		if (si_qstType == "starts")
-			si_question.text = "Seleziona le figure che iniziano con il suono " + si_sound;
+			si_question.text = "Seleziona le figure che <color=red>iniziano</color> con il suono <color=red>" + si_sound + "</color>";
 		else if (si_qstType == "contains")
-			si_question.text = "Seleziona le figure che contengono il suono " + si_sound;
+			si_question.text = "Seleziona le figure che <color=red>contengono</color> il suono <color=red>" + si_sound + "</color>";
 		else
 			si_question.text = "Seleziona le figure con il suono " + si_sound;
+
+		si_audio.onClick.RemoveAllListeners ();
+		si_audio.onClick.AddListener (delegate{si_textToSpeech(q_id);});
+		si_audio.gameObject.SetActive (true);
 	}
 
 	public void si_fillArray(string imgNames)
 	{
 		char[] words = imgNames.ToCharArray();
 		int c_idx = 0;
+		int i;
 
-		for (int i = 0; i < si_images.Length; i++) 
+		for (int iter = 0; iter < si_images.Length; iter++) 
 		{
+			do {
+				i = UnityEngine.Random.Range(0, si_images.Length);
+			} while(si_images[i].IsActive());
+
 			while (words[c_idx] != '+')
 				si_images [i].transform.GetChild(0).GetComponent<Text>().text += words[c_idx++];
-			if (i < si_images.Length - 2)
+			if (iter < si_images.Length - 2)
 				c_idx++;
-			if (i == si_images.Length - 1)
+			if (iter == si_images.Length - 1)
 				si_images [i].transform.GetChild(0).GetComponent<Text>().text = imgNames.Substring (++c_idx);
 			si_attachSprite(i, si_images[i].transform.GetChild(0).GetComponent<Text>().text.ToLower());
 			si_updateCounter(si_images[i].transform.GetChild(0).GetComponent<Text>().text);
@@ -1968,6 +1979,13 @@ public class QuestionManager : MonoBehaviour {
 		si_images [i].transform.GetChild(1).gameObject.SetActive (true);
 	}
 
+	public void si_textToSpeech(int i)
+	{
+		Debug.Log ("Play track " + i);
+		//si_audio.GetComponent<AudioSource> ().clip = si_clips [i];
+		//si_audio.GetComponent<AudioSource> ().Play ();
+	}
+
 	public void si_checkResult()
 	{
 		if (si_counter != si_correctAnswers) 
@@ -1983,6 +2001,7 @@ public class QuestionManager : MonoBehaviour {
 
 		si_question.text = "";
 		si_next.gameObject.SetActive(true);
+		si_audio.gameObject.SetActive (false);
 		for (int i = 0; i < si_images.Length; i++)
 			si_images [i].gameObject.SetActive (false);
 
