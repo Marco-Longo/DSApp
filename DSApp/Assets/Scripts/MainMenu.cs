@@ -188,6 +188,12 @@ public class MainMenu : MonoBehaviour {
 		PlayerPrefs.SetString("choice", "CountWords");
 		db.choice = "CountWords";
 	}
+	public void AccentWords_load()
+	{
+		SceneManager.LoadScene("3. QuestionTab");
+		PlayerPrefs.SetString("choice", "AccentWords");
+		db.choice = "AccentWords";
+	}
 
 	//public void menuSelection(int moveTo)
     //{

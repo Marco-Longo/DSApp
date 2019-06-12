@@ -20,6 +20,7 @@ TagManager:
   - InvertedGraphemeSearch
   - SoundImages
   - CountWords
+  - AccentWords
   layers:
   - Default
   - TransparentFX

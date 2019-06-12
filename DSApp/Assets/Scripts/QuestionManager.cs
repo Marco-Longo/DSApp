@@ -141,6 +141,12 @@ public class QuestionManager : MonoBehaviour {
 	public Button cw_send;
 	public InputField cw_answerText;
 
+	//AccentWords
+	public Button aw_next;
+	public Button[] aw_buttons;
+	private int aw_correctAnswers;
+	private int aw_counter;
+
     //flags
     bool correct;
     bool toNext;
@@ -174,6 +180,7 @@ public class QuestionManager : MonoBehaviour {
         GameObject.FindWithTag("GraphemeExchange").SetActive(false);
 		GameObject.FindWithTag("SoundImages").SetActive(false);
 		GameObject.FindWithTag("CountWords").SetActive(false);
+		GameObject.FindWithTag("AccentWords").SetActive(false);
 
         timecalled = 0;
     }
@@ -442,6 +449,20 @@ public class QuestionManager : MonoBehaviour {
 					str = db.getQuestion(q_id, q_type, true);
 					questionTxt.text += str[0];
 					answer = str[1];
+
+					break;
+				}
+			case "AccentWords":
+				{
+					GO.SetActive(true);                    
+
+					aw_next.onClick.AddListener(aw_nextQuestion);
+
+					q_id = getNewQuestion();
+
+					str = db.getQuestion(q_id, q_type, true);
+					answer = str[1];
+					aw_generateButtons (str[0]);
 
 					break;
 				}
@@ -2179,6 +2200,130 @@ public class QuestionManager : MonoBehaviour {
 		}
 	}
 
+	public void aw_generateButtons(string text)
+	{
+		aw_counter = 0;
+		aw_correctAnswers = 0;
+		char[] words = text.ToCharArray();
+		int c_idx = 0;
+		int i;
+
+		for (int iter = 0; iter < aw_buttons.Length; iter++) 
+		{
+			do {
+				i = UnityEngine.Random.Range (0, aw_buttons.Length);
+			} while(aw_buttons [i].IsActive ());
+
+			if (iter == aw_buttons.Length - 1)
+				aw_buttons [i].transform.GetChild (0).GetComponent<Text> ().text = text.Substring (c_idx);
+			else 
+			{
+				while (words [c_idx] != '+')
+					aw_buttons [i].transform.GetChild (0).GetComponent<Text> ().text += words [c_idx++];
+				c_idx++;
+			}
+
+			if (answer.Contains (aw_buttons [i].transform.GetChild (0).GetComponent<Text> ().text))
+				aw_correctAnswers++;
+			aw_buttons [i].gameObject.SetActive (true);
+			int _i = i;
+			aw_buttons[i].onClick.AddListener(delegate {aw_assignBehaviour(_i);});
+		}
+	}
+
+	public void aw_assignBehaviour(int i)
+	{
+		if (answer.Contains (aw_buttons [i].transform.GetChild (0).GetComponent<Text> ().text)) {
+			aw_buttons [i].GetComponent<Image> ().color = Color.green;
+			questionTxt.GetComponent<AudioSource> ().Play ();
+			aw_counter++;
+			if (aw_counter == aw_correctAnswers)
+				aw_checkResult ();
+		} 
+		else 
+		{
+			aw_buttons [i].GetComponent<Image> ().color = Color.red;
+			result.GetComponent<AudioSource> ().Play ();
+			errorTmp++;
+		}
+
+		aw_buttons [i].interactable = false;
+	}
+
+	public void aw_checkResult()
+	{
+		if (aw_counter != aw_correctAnswers) 
+		{
+			result.text = "Devi prima trovare tutte le corrispondenze!";
+			return;
+		}
+
+		questionTxt.text = "Hai trovato tutte le corrispondenze!";
+		recordTime();
+		if(errorTmp > 0)
+			wrongAnsw++;
+
+		aw_next.gameObject.SetActive(true);
+		for (int i = 0; i < aw_buttons.Length; i++)
+			aw_buttons [i].gameObject.SetActive (false);
+
+		correct = true;
+		errorCount += errorTmp;
+		errorTmp = 0;
+	}
+
+	public void aw_resetButtons()
+	{
+		for (int i = 0; i < aw_buttons.Length; i++) 
+		{
+			aw_buttons [i].GetComponent<Image> ().color = Color.white;
+			aw_buttons [i].onClick.RemoveAllListeners ();
+			aw_buttons [i].transform.GetChild (0).GetComponent<Text> ().text = "";
+			aw_buttons [i].GetComponent<Button> ().interactable = true;
+		}
+	}
+
+	public void aw_nextQuestion()
+	{
+		checkCorrect();
+		aw_next.gameObject.SetActive (false);
+		aw_resetButtons ();
+
+		if (toNext == true && index < 5) 
+		{
+			index++;
+			toNext = false;
+
+			q_id = getNewQuestion ();
+			str = db.getQuestion (q_id, q_type, true);
+			answer = str [1];
+			aw_generateButtons(str[0]);
+
+			errorTmp = 0;
+			active = true;
+			questionTxt.text = "";
+		}
+		else if (index < 5)
+			result.text = "Devi prima rispondere correttamente alla domanda!";
+		else
+		{
+			aw_next.onClick.RemoveAllListeners();
+			GO.SetActive(false);
+
+			questionTxt.text = "Hai completato le domande! Torna al menù!";
+			result.text = "";
+
+			if (collect)
+			{
+				db.updateStat("AccentWords", "LastError", errorCount.ToString(), player);
+				db.updateStat("AccentWords", "LastTime", mainTimer.ToString(), player);
+				db.updateStat("AccentWords", "TotalTime", (float.Parse(db.getStat("AccentWords", "TotalTime", player)) + mainTimer).ToString(), player);
+				db.addStat(player, "AccentWords", DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss").ToString(), wrongAnsw.ToString(), errorCount.ToString(), (5 - wrongAnsw).ToString(), mainTimer.ToString(), "0");
+			}
+
+			btnMenu.transform.position = new Vector3(Screen.width / 2, Screen.height / 2 - 30f, 0f);
+		}
+	}
 
 
     //generic

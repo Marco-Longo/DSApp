@@ -344,7 +344,6 @@ public class StatsManager : MonoBehaviour {
 					StatScrollView.GetComponentInChildren<ScrollRect>().verticalNormalizedPosition = 1f;
 					StatScrollbar.GetComponent<Scrollbar>().interactable = false;
 					StatScrollbar.transform.GetChild(0).GetChild(0).gameObject.SetActive(false);
-                    MiniGameButton[2].gameObject.SetActive(false);
                     MiniGameButton[3].gameObject.SetActive(false);
                     MiniGameButton[4].gameObject.SetActive(false);
                     MiniGameButton[5].gameObject.SetActive(false);
@@ -353,12 +352,15 @@ public class StatsManager : MonoBehaviour {
 
                     MiniGameButton[0].gameObject.SetActive(true);
                     MiniGameButton[1].gameObject.SetActive(true);
+					MiniGameButton[2].gameObject.SetActive(true);
 
                     MiniGameButton[0].onClick.RemoveAllListeners();
                     MiniGameButton[1].onClick.RemoveAllListeners();
-
-                    MiniGameButton[0].onClick.AddListener(delegate { selectDetStat(9); });
+					MiniGameButton[2].onClick.RemoveAllListeners();
+                    
+					MiniGameButton[0].onClick.AddListener(delegate { selectDetStat(9); });
                     MiniGameButton[1].onClick.AddListener(delegate { selectDetStat(10); });
+					MiniGameButton[2].onClick.AddListener(delegate { selectDetStat(15); }); //AccentWords
 
                     MacroCat.text = "Misti";
 
@@ -368,11 +370,17 @@ public class StatsManager : MonoBehaviour {
                     GameStats1[2].text = "Tempo ultima sessione: " + (float.Parse(db.getStat("DoubleLetters", "LastTime", kids[statsChoice.value])).ToString("n2") + "s");
                     GameStats1[3].text = "Tempo totale giocato: " + (float.Parse(db.getStat("DoubleLetters", "TotalTime", kids[statsChoice.value])).ToString("n2") + "s");
 
-                    MiniGameName[1].text = "Omissione/Aggiunta Accenti: ";
+                    MiniGameName[1].text = "Omissione/Aggiunta Accenti Frasi: ";
                     GameStats2[0].text = "Errori ultima sessione: " + db.getStat("AccentGame", "LastError", kids[statsChoice.value]);
                     GameStats2[1].text = "Tempo ultima sessione: " + (float.Parse(db.getStat("AccentGame", "LastTime", kids[statsChoice.value])).ToString("n2") + "s");
                     GameStats2[2].text = "Tempo totale giocato: " + (float.Parse(db.getStat("AccentGame", "TotalTime", kids[statsChoice.value])).ToString("n2") + "s");
                     GameStats2[3].text = "";
+
+					MiniGameName[2].text = "Omissione/Aggiunta Accenti Parole: ";
+					GameStats3[0].text = "Errori ultima sessione: " + db.getStat("AccentWords", "LastError", kids[statsChoice.value]);
+					GameStats3[1].text = "Tempo ultima sessione: " + (float.Parse(db.getStat("AccentWords", "LastTime", kids[statsChoice.value])).ToString("n2") + "s");
+					GameStats3[2].text = "Tempo totale giocato: " + (float.Parse(db.getStat("AccentWords", "TotalTime", kids[statsChoice.value])).ToString("n2") + "s");
+					GameStats3[3].text = "";
                     
                     break;
                 }
@@ -725,13 +733,13 @@ public class StatsManager : MonoBehaviour {
         {
             case 0:
                 {
-                    MacroCat.text = "Omissione/Aggiunta Grafema Immagini";
+                    MacroCat.text = "Omiss/Agg Grafema Immagini";
                     DetStat(kidN, "GraphemePic");
                     break;
                 }
             case 1:
                 {
-                    MacroCat.text = "Inversione Grafemi";
+                    MacroCat.text = "Inversione Grafemi Coppie";
                     DetStat(kidN, "InvertedGrapheme");
                     break;
                 }
@@ -779,19 +787,19 @@ public class StatsManager : MonoBehaviour {
                 }
             case 9:
                 {
-                    MacroCat.text = "Omissione/Aggiunta Doppie";
+                    MacroCat.text = "Omiss/Agg Doppie";
                     DetStat(kidN, "DoubleLetters");
                     break;
                 }
             case 10:
                 {
-                    MacroCat.text = "Omissione/Aggiunta Accenti";
+                    MacroCat.text = "Omiss/Agg Accenti Frasi";
                     DetStat(kidN, "AccentGame");
                     break;
                 }
 			case 11:
 				{
-					MacroCat.text = "Omissione/Aggiunta Grafema Lettere Sparse";
+					MacroCat.text = "Omiss/Agg Grafema Lettere Sparse";
 					DetStat(kidN, "GraphemeClouds");
 					break;
 				}
@@ -811,6 +819,12 @@ public class StatsManager : MonoBehaviour {
 				{
 					MacroCat.text = "Conta le parole";
 					DetStat(kidN, "CountWords");
+					break;
+				}
+			case 15:
+				{
+					MacroCat.text = "Omiss/Agg Accenti Parole";
+					DetStat(kidN, "AccentWords");
 					break;
 				}
         }
