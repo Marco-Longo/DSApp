@@ -136,6 +136,11 @@ public class QuestionManager : MonoBehaviour {
 	private int si_correctAnswers;
 	private int si_counter;
 
+	//CountWords
+	public Button cw_next;
+	public Button cw_send;
+	public InputField cw_answerText;
+
     //flags
     bool correct;
     bool toNext;
@@ -168,6 +173,7 @@ public class QuestionManager : MonoBehaviour {
 		GameObject.FindWithTag("SentenceSplit").SetActive(false);
         GameObject.FindWithTag("GraphemeExchange").SetActive(false);
 		GameObject.FindWithTag("SoundImages").SetActive(false);
+		GameObject.FindWithTag("CountWords").SetActive(false);
 
         timecalled = 0;
     }
@@ -424,6 +430,21 @@ public class QuestionManager : MonoBehaviour {
 
 					break;
 				}
+			case "CountWords":
+				{
+					GO.SetActive(true);                    
+
+					cw_send.onClick.AddListener(cw_checkResult);
+					cw_next.onClick.AddListener(cw_nextQuestion);
+
+					q_id = getNewQuestion();
+
+					str = db.getQuestion(q_id, q_type, true);
+					questionTxt.text += str[0];
+					answer = str[1];
+
+					break;
+				}
             default:
                 {
                     break;
@@ -466,7 +487,8 @@ public class QuestionManager : MonoBehaviour {
             return;
         }
 
-        if (errorTmp < 2){
+        if (errorTmp < 2)
+		{
             result.text = "Riprova!";
             result.GetComponent<AudioSource>().Play();
 
@@ -2066,6 +2088,98 @@ public class QuestionManager : MonoBehaviour {
 			btnMenu.transform.position = new Vector3(Screen.width / 2, Screen.height / 2 - 30f, 0f);
 		}
 	}
+
+	//CountWords
+	public void cw_checkResult()
+	{
+		if (String.Equals(cw_answerText.text, answer, StringComparison.OrdinalIgnoreCase))
+		{
+			result.text = "Corretto!";
+			errorTmp = 0;
+
+			questionTxt.GetComponent<AudioSource>().Play();
+			//recordTime();
+
+			correct = true;
+			cw_send.gameObject.SetActive(false);
+			cw_next.gameObject.SetActive(true);
+
+			return;
+		}
+
+		if (errorTmp < 2)
+		{
+			result.text = "Riprova!";
+			result.GetComponent<AudioSource>().Play();
+
+			errorCount++;
+			errorTmp++;
+
+			return;
+		}
+
+		result.text = "La frase conteneva " + answer + " parole";
+		recordTime();
+		errorCount++;
+		wrongAnsw++;
+
+		cw_send.gameObject.SetActive(false);
+		cw_next.gameObject.SetActive(true);
+
+		result.GetComponent<AudioSource>().Play();
+
+		cw_send.interactable = false;
+
+		correct = true;
+		errorTmp = 0;
+	}
+
+	public void cw_nextQuestion()
+	{
+		checkCorrect();
+
+		if (toNext == true && index < 5)
+		{
+			toNext = false;
+			index++;
+
+			q_id = getNewQuestion();
+			str = db.getQuestion(q_id, q_type, true);
+			questionTxt.text = str[0];
+			answer = str[1];
+
+			cw_answerText.text = "";
+			result.text = "";
+			cw_send.interactable = true;
+			active = true;
+
+			cw_send.gameObject.SetActive(true);
+			cw_next.gameObject.SetActive(false);
+		}
+		else if (index < 5 || !toNext)
+		{
+			result.text = "Devi prima rispondere correttamente alla domanda!";
+		}
+		else if (toNext)
+		{
+			GO.SetActive(false);
+
+			questionTxt.text = "Hai completato le domande! Torna al menù!";
+
+			result.text = "";
+			if (collect)
+			{ 
+				db.updateStat("CountWords", "LastError", errorCount.ToString(), player);
+				db.updateStat("CountWords", "LastTime", mainTimer.ToString(), player);
+				db.updateStat("CountWords", "TotalTime", (float.Parse(db.getStat("CountWords", "TotalTime", player)) + mainTimer).ToString(), player);
+				db.addStat(player, "CountWords", DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss").ToString(), wrongAnsw.ToString(), errorCount.ToString(), (5 - wrongAnsw).ToString(), mainTimer.ToString(), "0");
+			}
+
+			btnMenu.transform.position = new Vector3(Screen.width / 2, Screen.height / 2 - 30f, 0f);
+		}
+	}
+
+
 
     //generic
 	int getNewQuestion()

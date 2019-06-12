@@ -182,6 +182,12 @@ public class MainMenu : MonoBehaviour {
 		PlayerPrefs.SetString("choice", "SoundImages");
 		db.choice = "SoundImages";
 	}
+	public void CountWords_load()
+	{
+		SceneManager.LoadScene("3. QuestionTab");
+		PlayerPrefs.SetString("choice", "CountWords");
+		db.choice = "CountWords";
+	}
 
 	//public void menuSelection(int moveTo)
     //{

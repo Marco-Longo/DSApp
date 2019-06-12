@@ -282,7 +282,6 @@ public class StatsManager : MonoBehaviour {
 					StatScrollView.GetComponentInChildren<ScrollRect>().verticalNormalizedPosition = 1f;
 					StatScrollbar.GetComponent<Scrollbar>().interactable = false;
 					StatScrollbar.transform.GetChild(0).GetChild(0).gameObject.SetActive(false);
-                    MiniGameButton[4].gameObject.SetActive(false);
                     MiniGameButton[5].gameObject.SetActive(false);
 					MiniGameButton[6].gameObject.SetActive(false);
 					MiniGameButton[7].gameObject.SetActive(false);
@@ -291,42 +290,51 @@ public class StatsManager : MonoBehaviour {
                     MiniGameButton[1].gameObject.SetActive(true);
                     MiniGameButton[2].gameObject.SetActive(true);
                     MiniGameButton[3].gameObject.SetActive(true);
+					MiniGameButton[4].gameObject.SetActive(true);
 
                     MiniGameButton[0].onClick.RemoveAllListeners();
                     MiniGameButton[1].onClick.RemoveAllListeners();
                     MiniGameButton[2].onClick.RemoveAllListeners();
                     MiniGameButton[3].onClick.RemoveAllListeners();
+					MiniGameButton[4].onClick.RemoveAllListeners();
 
                     MiniGameButton[0].onClick.AddListener(delegate { selectDetStat(5); });
-                    MiniGameButton[1].onClick.AddListener(delegate { selectDetStat(6); });
-                    MiniGameButton[2].onClick.AddListener(delegate { selectDetStat(7); });
-                    MiniGameButton[3].onClick.AddListener(delegate { selectDetStat(8); });
+					MiniGameButton[1].onClick.AddListener(delegate { selectDetStat(14);}); //CountWords
+                    MiniGameButton[2].onClick.AddListener(delegate { selectDetStat(6); });
+                    MiniGameButton[3].onClick.AddListener(delegate { selectDetStat(7); });
+					MiniGameButton[4].onClick.AddListener(delegate { selectDetStat(8); });
 
                     MacroCat.text = "Non Fonologici";
                     
-                    MiniGameName[0].text = "Separa le parole:";
+                    MiniGameName[0].text = "Separa le parole: ";
                     GameStats1[0].text = "Errori ultima sessione: " + db.getStat("SentenceSplit", "LastError", kids[statsChoice.value]);
                     GameStats1[1].text = "Tempo ultima sessione: " + (float.Parse(db.getStat("SentenceSplit", "LastTime", kids[statsChoice.value])).ToString("n2") + "s");
                     GameStats1[2].text = "Tempo totale giocato: " + (float.Parse(db.getStat("SentenceSplit", "TotalTime", kids[statsChoice.value])).ToString("n2") + "s");
                     GameStats1[3].text = "";
 
-                    MiniGameName[1].text = "Indovina le parole: ";
-                    GameStats2[0].text = "Errori ultima sessione: " + db.getStat("AudioGame", "LastError", kids[statsChoice.value]);
-                    GameStats2[1].text = "Riproduzioni ultima sessione: " + db.getStat("AudioGame", "Other", kids[statsChoice.value]);
-                    GameStats2[2].text = "Tempo ultima sessione: " + (float.Parse(db.getStat("AudioGame", "LastTime", kids[statsChoice.value])).ToString("n2") + "s");
-                    GameStats2[3].text = "Tempo totale giocato: " + (float.Parse(db.getStat("AudioGame", "TotalTime", kids[statsChoice.value])).ToString("n2") + "s");
+					MiniGameName[1].text = "Conta le parole: ";
+					GameStats2[0].text = "Errori ultima sessione: " + db.getStat("CountWords", "LastError", kids[statsChoice.value]);
+					GameStats2[1].text = "Tempo ultima sessione: " + (float.Parse(db.getStat("CountWords", "LastTime", kids[statsChoice.value])).ToString("n2") + "s");
+					GameStats2[2].text = "Tempo totale giocato: " + (float.Parse(db.getStat("CountWords", "TotalTime", kids[statsChoice.value])).ToString("n2") + "s");
+					GameStats2[3].text = "";
 
-                    MiniGameName[2].text = "Scambio Grafema CU-QU: ";
-                    GameStats3[0].text = "Errori ultima sessione: " + db.getStat("CQGame", "LastError", kids[statsChoice.value]);
-                    GameStats3[1].text = "Tempo ultima sessione: " + (float.Parse(db.getStat("CQGame", "LastTime", kids[statsChoice.value])).ToString("n2") + "s");
-                    GameStats3[2].text = "Tempo totale giocato: " + (float.Parse(db.getStat("CQGame", "TotalTime", kids[statsChoice.value])).ToString("n2") + "s");
-                    GameStats3[3].text = "";
+                    MiniGameName[2].text = "Indovina le parole: ";
+                    GameStats3[0].text = "Errori ultima sessione: " + db.getStat("AudioGame", "LastError", kids[statsChoice.value]);
+                    GameStats3[1].text = "Riproduzioni ultima sessione: " + db.getStat("AudioGame", "Other", kids[statsChoice.value]);
+                    GameStats3[2].text = "Tempo ultima sessione: " + (float.Parse(db.getStat("AudioGame", "LastTime", kids[statsChoice.value])).ToString("n2") + "s");
+                    GameStats3[3].text = "Tempo totale giocato: " + (float.Parse(db.getStat("AudioGame", "TotalTime", kids[statsChoice.value])).ToString("n2") + "s");
 
-                    MiniGameName[3].text = "Omissione/Aggiunta 'H': ";
-                    GameStats4[0].text = "Errori ultima sessione: " + db.getStat("HGame", "LastError", kids[statsChoice.value]);
-                    GameStats4[1].text = "Tempo ultima sessione: " + (float.Parse(db.getStat("HGame", "LastTime", kids[statsChoice.value])).ToString("n2") + "s");
-                    GameStats4[2].text = "Tempo totale giocato: " + (float.Parse(db.getStat("HGame", "TotalTime", kids[statsChoice.value])).ToString("n2") + "s");
+                    MiniGameName[3].text = "Scambio Grafema CU-QU: ";
+                    GameStats4[0].text = "Errori ultima sessione: " + db.getStat("CQGame", "LastError", kids[statsChoice.value]);
+                    GameStats4[1].text = "Tempo ultima sessione: " + (float.Parse(db.getStat("CQGame", "LastTime", kids[statsChoice.value])).ToString("n2") + "s");
+                    GameStats4[2].text = "Tempo totale giocato: " + (float.Parse(db.getStat("CQGame", "TotalTime", kids[statsChoice.value])).ToString("n2") + "s");
                     GameStats4[3].text = "";
+
+					MiniGameName[4].text = "Omissione/Aggiunta 'H': ";
+					GameStats5[0].text = "Errori ultima sessione: " + db.getStat("HGame", "LastError", kids[statsChoice.value]);
+					GameStats5[1].text = "Tempo ultima sessione: " + (float.Parse(db.getStat("HGame", "LastTime", kids[statsChoice.value])).ToString("n2") + "s");
+					GameStats5[2].text = "Tempo totale giocato: " + (float.Parse(db.getStat("HGame", "TotalTime", kids[statsChoice.value])).ToString("n2") + "s");
+					GameStats5[3].text = "";
 
                     break;
                 }
@@ -797,6 +805,12 @@ public class StatsManager : MonoBehaviour {
 				{
 					MacroCat.text = "Scambio Grafema Ricerca Suono";
 					DetStat(kidN, "SoundImages");
+					break;
+				}
+			case 14:
+				{
+					MacroCat.text = "Conta le parole";
+					DetStat(kidN, "CountWords");
 					break;
 				}
         }

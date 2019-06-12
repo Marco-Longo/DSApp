@@ -19,6 +19,7 @@ TagManager:
   - GraphemeClouds
   - InvertedGraphemeSearch
   - SoundImages
+  - CountWords
   layers:
   - Default
   - TransparentFX
