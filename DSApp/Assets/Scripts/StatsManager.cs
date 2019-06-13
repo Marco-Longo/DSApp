@@ -344,7 +344,6 @@ public class StatsManager : MonoBehaviour {
 					StatScrollView.GetComponentInChildren<ScrollRect>().verticalNormalizedPosition = 1f;
 					StatScrollbar.GetComponent<Scrollbar>().interactable = false;
 					StatScrollbar.transform.GetChild(0).GetChild(0).gameObject.SetActive(false);
-                    MiniGameButton[3].gameObject.SetActive(false);
                     MiniGameButton[4].gameObject.SetActive(false);
                     MiniGameButton[5].gameObject.SetActive(false);
 					MiniGameButton[6].gameObject.SetActive(false);
@@ -353,34 +352,43 @@ public class StatsManager : MonoBehaviour {
                     MiniGameButton[0].gameObject.SetActive(true);
                     MiniGameButton[1].gameObject.SetActive(true);
 					MiniGameButton[2].gameObject.SetActive(true);
+					MiniGameButton[3].gameObject.SetActive(true);
 
                     MiniGameButton[0].onClick.RemoveAllListeners();
                     MiniGameButton[1].onClick.RemoveAllListeners();
 					MiniGameButton[2].onClick.RemoveAllListeners();
-                    
+					MiniGameButton[3].onClick.RemoveAllListeners();
+
 					MiniGameButton[0].onClick.AddListener(delegate { selectDetStat(9); });
-                    MiniGameButton[1].onClick.AddListener(delegate { selectDetStat(10); });
-					MiniGameButton[2].onClick.AddListener(delegate { selectDetStat(15); }); //AccentWords
+					MiniGameButton[1].onClick.AddListener(delegate { selectDetStat(16); }); //DoubleSentences
+                    MiniGameButton[2].onClick.AddListener(delegate { selectDetStat(10); });
+					MiniGameButton[3].onClick.AddListener(delegate { selectDetStat(15); }); //AccentWords
 
                     MacroCat.text = "Misti";
 
-                    MiniGameName[0].text = "Omissione/Aggiunta Doppie: ";
+                    MiniGameName[0].text = "Omissione/Aggiunta Doppie Audio: ";
                     GameStats1[0].text = "Errori ultima sessione: " + db.getStat("DoubleLetters", "LastError", kids[statsChoice.value]);
                     GameStats1[1].text = "Riproduzioni ultima sessione: " + db.getStat("DoubleLetters", "Other", kids[statsChoice.value]);
                     GameStats1[2].text = "Tempo ultima sessione: " + (float.Parse(db.getStat("DoubleLetters", "LastTime", kids[statsChoice.value])).ToString("n2") + "s");
                     GameStats1[3].text = "Tempo totale giocato: " + (float.Parse(db.getStat("DoubleLetters", "TotalTime", kids[statsChoice.value])).ToString("n2") + "s");
 
-                    MiniGameName[1].text = "Omissione/Aggiunta Accenti Frasi: ";
-                    GameStats2[0].text = "Errori ultima sessione: " + db.getStat("AccentGame", "LastError", kids[statsChoice.value]);
-                    GameStats2[1].text = "Tempo ultima sessione: " + (float.Parse(db.getStat("AccentGame", "LastTime", kids[statsChoice.value])).ToString("n2") + "s");
-                    GameStats2[2].text = "Tempo totale giocato: " + (float.Parse(db.getStat("AccentGame", "TotalTime", kids[statsChoice.value])).ToString("n2") + "s");
-                    GameStats2[3].text = "";
+					MiniGameName[1].text = "Omissione/Aggiunta Doppie Frasi: ";
+					GameStats2[0].text = "Errori ultima sessione: " + db.getStat("DoubleSentences", "LastError", kids[statsChoice.value]);
+					GameStats2[1].text = "Tempo ultima sessione: " + (float.Parse(db.getStat("DoubleSentences", "LastTime", kids[statsChoice.value])).ToString("n2") + "s");
+					GameStats2[2].text = "Tempo totale giocato: " + (float.Parse(db.getStat("DoubleSentences", "TotalTime", kids[statsChoice.value])).ToString("n2") + "s");
+					GameStats2[3].text = "";
 
-					MiniGameName[2].text = "Omissione/Aggiunta Accenti Parole: ";
-					GameStats3[0].text = "Errori ultima sessione: " + db.getStat("AccentWords", "LastError", kids[statsChoice.value]);
-					GameStats3[1].text = "Tempo ultima sessione: " + (float.Parse(db.getStat("AccentWords", "LastTime", kids[statsChoice.value])).ToString("n2") + "s");
-					GameStats3[2].text = "Tempo totale giocato: " + (float.Parse(db.getStat("AccentWords", "TotalTime", kids[statsChoice.value])).ToString("n2") + "s");
-					GameStats3[3].text = "";
+                    MiniGameName[2].text = "Omissione/Aggiunta Accenti Frasi: ";
+                    GameStats3[0].text = "Errori ultima sessione: " + db.getStat("AccentGame", "LastError", kids[statsChoice.value]);
+                    GameStats3[1].text = "Tempo ultima sessione: " + (float.Parse(db.getStat("AccentGame", "LastTime", kids[statsChoice.value])).ToString("n2") + "s");
+                    GameStats3[2].text = "Tempo totale giocato: " + (float.Parse(db.getStat("AccentGame", "TotalTime", kids[statsChoice.value])).ToString("n2") + "s");
+                    GameStats3[3].text = "";
+
+					MiniGameName[3].text = "Omissione/Aggiunta Accenti Parole: ";
+					GameStats4[0].text = "Errori ultima sessione: " + db.getStat("AccentWords", "LastError", kids[statsChoice.value]);
+					GameStats4[1].text = "Tempo ultima sessione: " + (float.Parse(db.getStat("AccentWords", "LastTime", kids[statsChoice.value])).ToString("n2") + "s");
+					GameStats4[2].text = "Tempo totale giocato: " + (float.Parse(db.getStat("AccentWords", "TotalTime", kids[statsChoice.value])).ToString("n2") + "s");
+					GameStats4[3].text = "";
                     
                     break;
                 }
@@ -787,7 +795,7 @@ public class StatsManager : MonoBehaviour {
                 }
             case 9:
                 {
-                    MacroCat.text = "Omiss/Agg Doppie";
+                    MacroCat.text = "Omiss/Agg Doppie Audio";
                     DetStat(kidN, "DoubleLetters");
                     break;
                 }
@@ -825,6 +833,12 @@ public class StatsManager : MonoBehaviour {
 				{
 					MacroCat.text = "Omiss/Agg Accenti Parole";
 					DetStat(kidN, "AccentWords");
+					break;
+				}
+			case 16:
+				{
+					MacroCat.text = "Omiss/Agg Doppie Frasi";
+					DetStat(kidN, "DoubleSentences");
 					break;
 				}
         }

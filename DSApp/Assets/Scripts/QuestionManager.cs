@@ -147,6 +147,11 @@ public class QuestionManager : MonoBehaviour {
 	private int aw_correctAnswers;
 	private int aw_counter;
 
+	//DoubleSentences
+	public Button ds_next;
+	public Button ds_answ1;
+	public Button ds_answ2;
+
     //flags
     bool correct;
     bool toNext;
@@ -181,6 +186,7 @@ public class QuestionManager : MonoBehaviour {
 		GameObject.FindWithTag("SoundImages").SetActive(false);
 		GameObject.FindWithTag("CountWords").SetActive(false);
 		GameObject.FindWithTag("AccentWords").SetActive(false);
+		GameObject.FindWithTag("DoubleSentences").SetActive(false);
 
         timecalled = 0;
     }
@@ -463,6 +469,22 @@ public class QuestionManager : MonoBehaviour {
 					str = db.getQuestion(q_id, q_type, true);
 					answer = str[1];
 					aw_generateButtons (str[0]);
+
+					break;
+				}
+			case "DoubleSentences":
+				{
+					GO.SetActive(true);
+
+					q_id = getNewQuestion();
+					ds_next.onClick.AddListener(ds_nextQuestion);
+
+					str = db.getQuestion(q_id, q_type, true);
+
+					questionTxt.text += str[0];
+					answer = str[1];
+
+					ds_setButtons(answer);
 
 					break;
 				}
@@ -2325,6 +2347,125 @@ public class QuestionManager : MonoBehaviour {
 		}
 	}
 
+	//DoubleSenteces
+	public void ds_setButtons(string s)
+	{
+		string ds_correctAnswer = s.Substring(0, s.IndexOf('+'));
+		string ds_wrongAnswer = s.Substring (s.IndexOf ('+') + 1);
+
+		ds_next.gameObject.SetActive(false);
+		ds_answ1.gameObject.SetActive(true);
+		ds_answ1.gameObject.SetActive(true);
+		ds_answ1.onClick.RemoveAllListeners ();
+		ds_answ2.onClick.RemoveAllListeners ();
+
+		if (UnityEngine.Random.Range (0, 100) < 50) 
+		{
+			ds_answ1.transform.GetChild (0).GetComponent<Text> ().text = ds_correctAnswer;
+			ds_answ1.onClick.AddListener (ds_correct);
+			ds_answ2.transform.GetChild (0).GetComponent<Text> ().text = ds_wrongAnswer;
+			ds_answ2.onClick.AddListener (ds_wrong);
+		} 
+		else 
+		{
+			ds_answ2.transform.GetChild (0).GetComponent<Text> ().text = ds_correctAnswer;
+			ds_answ2.onClick.AddListener (ds_correct);
+			ds_answ1.transform.GetChild (0).GetComponent<Text> ().text = ds_wrongAnswer;
+			ds_answ1.onClick.AddListener (ds_wrong);
+		}
+	}
+
+	public void ds_correct()
+	{
+		result.text = "Corretto!";
+		questionTxt.text = questionTxt.text.Replace("_", answer.Substring(0, answer.IndexOf('+')));
+
+		ds_answ1.gameObject.SetActive(false);
+		ds_answ2.gameObject.SetActive(false);
+		ds_next.gameObject.SetActive(true);
+
+		recordTime();
+		questionTxt.GetComponent<AudioSource>().Play();
+
+		errorTmp = 0;
+		correct = true;
+	}
+
+	public void ds_wrong()
+	{
+		if (errorTmp == 2)
+		{
+			result.text = "La risposta corretta è " + answer.Substring(0, answer.IndexOf('+')) + "! Prova con la prossima!";
+
+			questionTxt.text = questionTxt.text.Replace("_", answer.Substring(0, answer.IndexOf('+')));
+
+			ds_next.gameObject.SetActive(true);
+			ds_answ1.gameObject.SetActive(false);
+			ds_answ2.gameObject.SetActive(false);
+
+			wrongAnsw++;
+			errorCount++;
+
+			errorTmp = 0;
+			recordTime();
+			result.GetComponent<AudioSource>().Play();
+
+			correct = true;
+			return;
+		}
+
+		result.text = "Riprova!";
+		result.GetComponent<AudioSource>().Play();
+		errorCount++;
+		errorTmp++;
+	}
+
+	public void ds_nextQuestion()
+	{
+		checkCorrect();
+
+		if (toNext == true && index < 5)
+		{
+			index++;
+
+			toNext = false;
+
+			q_id = getNewQuestion();
+			str = db.getQuestion(q_id, q_type, true);
+
+			questionTxt.text = str[0];
+			answer = str[1];
+			ds_setButtons(answer);
+			active = true;
+
+			result.text = "";
+
+			ds_next.gameObject.SetActive(false);
+			ds_answ1.gameObject.SetActive(true);
+			ds_answ2.gameObject.SetActive(true);
+		}
+		else if (index < 5)
+			result.text = "Devi prima rispondere correttamente alla domanda!";
+		else
+		{
+			ds_next.onClick.RemoveAllListeners();
+			GO.SetActive(false);
+
+			questionTxt.text = "Hai completato le domande! Torna al menù!";
+
+			result.text = "";
+
+			if (collect)
+			{
+				db.updateStat("DoubleSentences", "LastError", errorCount.ToString(), player);
+				db.updateStat("DoubleSentences", "LastTime", mainTimer.ToString(), player);
+				db.updateStat("DoubleSentences", "TotalTime", (float.Parse(db.getStat("DoubleSentences", "TotalTime", player)) + mainTimer).ToString(), player);
+				db.addStat(player, q_type, DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss").ToString(), wrongAnsw.ToString(), errorCount.ToString(), (5 - wrongAnsw).ToString(), mainTimer.ToString(), "0");
+			}
+
+			btnMenu.transform.position = new Vector3(Screen.width / 2, Screen.height / 2 - 30f, 0f);
+		}
+	}
 
     //generic
 	int getNewQuestion()

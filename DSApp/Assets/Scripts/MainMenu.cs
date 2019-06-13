@@ -194,6 +194,12 @@ public class MainMenu : MonoBehaviour {
 		PlayerPrefs.SetString("choice", "AccentWords");
 		db.choice = "AccentWords";
 	}
+	public void DoubleSentences_load()
+	{
+		SceneManager.LoadScene("3. QuestionTab");
+		PlayerPrefs.SetString("choice", "DoubleSentences");
+		db.choice = "DoubleSentences";
+	}
 
 	//public void menuSelection(int moveTo)
     //{

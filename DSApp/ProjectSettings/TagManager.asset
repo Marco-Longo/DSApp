@@ -21,6 +21,7 @@ TagManager:
   - SoundImages
   - CountWords
   - AccentWords
+  - DoubleSentences
   layers:
   - Default
   - TransparentFX
