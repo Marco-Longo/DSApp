@@ -152,6 +152,18 @@ public class QuestionManager : MonoBehaviour {
 	public Button ds_answ1;
 	public Button ds_answ2;
 
+	//HSentences
+	public Button hs_next;
+	public Button hs_sent1;
+	public Button hs_sent2;
+
+	//CQSentences
+	public Button cqs_next;
+	public Button cqs_CU;
+	public Button cqs_CQU;
+	public Button cqs_QU;
+	public Button cqs_CCU;
+
     //flags
     bool correct;
     bool toNext;
@@ -187,6 +199,8 @@ public class QuestionManager : MonoBehaviour {
 		GameObject.FindWithTag("CountWords").SetActive(false);
 		GameObject.FindWithTag("AccentWords").SetActive(false);
 		GameObject.FindWithTag("DoubleSentences").SetActive(false);
+		GameObject.FindWithTag("HSentences").SetActive(false);
+		GameObject.FindWithTag("CQSentences").SetActive(false);
 
         timecalled = 0;
     }
@@ -485,6 +499,36 @@ public class QuestionManager : MonoBehaviour {
 					answer = str[1];
 
 					ds_setButtons(answer);
+
+					break;
+				}
+			case "HSentences":
+				{
+					GO.SetActive(true);
+
+					q_id = getNewQuestion();
+					hs_next.onClick.AddListener(hs_nextQuestion);
+
+					str = db.getQuestion(q_id, q_type, true);
+
+					answer = str[1];
+					hs_setButtons(str[0]);
+
+					break;
+				}
+			case "CQSentences":
+				{
+					GO.SetActive(true);
+
+					q_id = getNewQuestion();
+					str = db.getQuestion(q_id, q_type, true);
+
+					questionTxt.text += str[0];
+					answer = str[1];
+
+					cqs_setButtons(answer);
+
+					cqs_next.onClick.AddListener(cqs_nextQuestion);
 
 					break;
 				}
@@ -2355,7 +2399,7 @@ public class QuestionManager : MonoBehaviour {
 
 		ds_next.gameObject.SetActive(false);
 		ds_answ1.gameObject.SetActive(true);
-		ds_answ1.gameObject.SetActive(true);
+		ds_answ2.gameObject.SetActive(true);
 		ds_answ1.onClick.RemoveAllListeners ();
 		ds_answ2.onClick.RemoveAllListeners ();
 
@@ -2460,12 +2504,283 @@ public class QuestionManager : MonoBehaviour {
 				db.updateStat("DoubleSentences", "LastError", errorCount.ToString(), player);
 				db.updateStat("DoubleSentences", "LastTime", mainTimer.ToString(), player);
 				db.updateStat("DoubleSentences", "TotalTime", (float.Parse(db.getStat("DoubleSentences", "TotalTime", player)) + mainTimer).ToString(), player);
-				db.addStat(player, q_type, DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss").ToString(), wrongAnsw.ToString(), errorCount.ToString(), (5 - wrongAnsw).ToString(), mainTimer.ToString(), "0");
+				db.addStat(player, "DoubleSentences", DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss").ToString(), wrongAnsw.ToString(), errorCount.ToString(), (5 - wrongAnsw).ToString(), mainTimer.ToString(), "0");
 			}
 
 			btnMenu.transform.position = new Vector3(Screen.width / 2, Screen.height / 2 - 30f, 0f);
 		}
 	}
+
+	//HSentences
+	public void hs_setButtons(string s)
+	{
+		hs_next.gameObject.SetActive(false);
+		hs_sent1.gameObject.SetActive(true);
+		hs_sent2.gameObject.SetActive(true);
+		hs_sent1.onClick.RemoveAllListeners ();
+		hs_sent2.onClick.RemoveAllListeners ();
+
+		if (UnityEngine.Random.Range (0, 100) < 50) 
+		{
+			hs_sent1.transform.GetChild (0).GetComponent<Text> ().text = s.Substring(0, s.IndexOf('+'));
+			hs_sent1.onClick.AddListener (hs_correct);
+			hs_sent2.transform.GetChild (0).GetComponent<Text> ().text = s.Substring (s.IndexOf ('+') + 1);
+			hs_sent2.onClick.AddListener (hs_wrong);
+		} 
+		else 
+		{
+			hs_sent2.transform.GetChild (0).GetComponent<Text> ().text = s.Substring(0, s.IndexOf('+'));
+			hs_sent2.onClick.AddListener (hs_correct);
+			hs_sent1.transform.GetChild (0).GetComponent<Text> ().text = s.Substring (s.IndexOf ('+') + 1);
+			hs_sent1.onClick.AddListener (hs_wrong);
+		}
+	}
+
+	public void hs_correct()
+	{
+		result.text = "Corretto!";
+		questionTxt.text = str[0].Substring(0, str[0].IndexOf('+'));
+
+		hs_sent1.gameObject.SetActive(false);
+		hs_sent2.gameObject.SetActive(false);
+		hs_next.gameObject.SetActive(true);
+
+		recordTime();
+		questionTxt.GetComponent<AudioSource>().Play();
+
+		errorTmp = 0;
+		correct = true;
+	}
+
+	public void hs_wrong()
+	{
+		if (errorTmp == 2)
+		{
+			questionTxt.text = "La frase corretta era:\n" + str[0].Substring(0, str[0].IndexOf('+'));
+			result.text = "Prova con la prossima!";
+
+			hs_next.gameObject.SetActive(true);
+			hs_sent1.gameObject.SetActive(false);
+			hs_sent2.gameObject.SetActive(false);
+
+			wrongAnsw++;
+			errorCount++;
+
+			errorTmp = 0;
+			recordTime();
+			result.GetComponent<AudioSource>().Play();
+
+			correct = true;
+			return;
+		}
+
+		result.text = "Riprova!";
+		result.GetComponent<AudioSource>().Play();
+		errorCount++;
+		errorTmp++;
+	}
+
+	public void hs_nextQuestion()
+	{
+		checkCorrect();
+
+		if (toNext == true && index < 5)
+		{
+			index++;
+
+			toNext = false;
+
+			q_id = getNewQuestion();
+			str = db.getQuestion(q_id, q_type, true);
+			hs_setButtons(str[0]);
+			answer = str[1];
+			questionTxt.text = "";
+
+			active = true;
+
+			result.text = "";
+
+			hs_next.gameObject.SetActive(false);
+			hs_sent1.gameObject.SetActive(true);
+			hs_sent2.gameObject.SetActive(true);
+		}
+		else if (index < 5)
+			result.text = "Devi prima rispondere correttamente alla domanda!";
+		else
+		{
+			hs_next.onClick.RemoveAllListeners();
+			GO.SetActive(false);
+
+			questionTxt.text = "Hai completato le domande! Torna al menù!";
+
+			result.text = "";
+
+			if (collect)
+			{
+				db.updateStat("HSentences", "LastError", errorCount.ToString(), player);
+				db.updateStat("HSentences", "LastTime", mainTimer.ToString(), player);
+				db.updateStat("HSentences", "TotalTime", (float.Parse(db.getStat("HSentences", "TotalTime", player)) + mainTimer).ToString(), player);
+				db.addStat(player, "HSentences", DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss").ToString(), wrongAnsw.ToString(), errorCount.ToString(), (5 - wrongAnsw).ToString(), mainTimer.ToString(), "0");
+			}
+
+			btnMenu.transform.position = new Vector3(Screen.width / 2, Screen.height / 2 - 30f, 0f);
+		}
+	}
+
+	//CQSentences
+	public void cqs_setButtons(string s)
+	{
+		cqs_next.gameObject.SetActive(false);
+		cqs_CU.gameObject.SetActive(true);
+		cqs_CCU.gameObject.SetActive(true);
+		cqs_QU.gameObject.SetActive(true);
+		cqs_CQU.gameObject.SetActive(true);
+
+		switch (s.ToLower())
+		{
+			case "cu":
+				{
+					cqs_CU.onClick.AddListener(cqs_correct);
+					cqs_CCU.onClick.AddListener(cqs_wrong);
+					cqs_QU.onClick.AddListener(cqs_wrong);
+					cqs_CQU.onClick.AddListener(cqs_wrong);
+
+					break;
+				}
+			case "qu":
+				{
+					cqs_QU.onClick.AddListener(cqs_correct);
+					cqs_CU.onClick.AddListener(cqs_wrong);
+					cqs_CCU.onClick.AddListener(cqs_wrong);
+					cqs_CQU.onClick.AddListener(cqs_wrong);
+
+					break;
+				}
+			case "cqu":
+				{
+					cqs_CQU.onClick.AddListener(cqs_correct);
+					cqs_CU.onClick.AddListener(cqs_wrong);
+					cqs_QU.onClick.AddListener(cqs_wrong);
+					cqs_CCU.onClick.AddListener(cqs_wrong);
+
+					break;
+				}
+			case "ccu":
+				{
+					cqs_CCU.onClick.AddListener(cqs_correct);
+					cqs_CU.onClick.AddListener(cqs_wrong);
+					cqs_QU.onClick.AddListener(cqs_wrong);
+					cqs_CQU.onClick.AddListener(cqs_wrong);
+
+					break;
+				}
+			case "rm":
+				{
+					cqs_CU.onClick.RemoveAllListeners();
+					cqs_QU.onClick.RemoveAllListeners();
+					cqs_CQU.onClick.RemoveAllListeners();
+					cqs_CCU.onClick.RemoveAllListeners();
+
+					break;
+				}
+		}
+	}
+
+	public void cqs_correct()
+	{
+		result.text = "Corretto!";
+		questionTxt.text = questionTxt.text.Replace("...", answer);
+		cqs_setButtons("rm");
+
+		cqs_next.gameObject.SetActive(true);
+		cqs_CU.gameObject.SetActive(false);
+		cqs_CCU.gameObject.SetActive(false);
+		cqs_QU.gameObject.SetActive(false);
+		cqs_CQU.gameObject.SetActive(false);
+
+		questionTxt.GetComponent<AudioSource>().Play();
+
+		recordTime();
+		errorTmp = 0;
+
+		correct = true;
+	}
+
+	public void cqs_wrong()
+	{
+		if(errorTmp == 2)
+		{
+			cqs_setButtons("rm");
+			result.text = "La risposta è " + answer + "! Prova con la prossima!";
+			questionTxt.text = questionTxt.text.Replace("...", answer);
+
+			wrongAnsw++;
+			errorCount++;
+
+			cqs_next.gameObject.SetActive(true);
+			cqs_CU.gameObject.SetActive(false);
+			cqs_CCU.gameObject.SetActive(false);
+			cqs_QU.gameObject.SetActive(false);
+			cqs_CQU.gameObject.SetActive(false);
+
+			errorTmp = 0;
+			recordTime();
+			result.GetComponent<AudioSource>().Play();
+
+			correct = true;
+			return;
+		}
+
+		result.text = "Riprova!";
+		result.GetComponent<AudioSource>().Play();
+		errorCount++;
+		errorTmp++;
+	}
+
+	public void cqs_nextQuestion()
+	{
+		checkCorrect();
+
+		if (toNext == true && index < 5)
+		{
+			toNext = false;
+			index++;
+
+			q_id = getNewQuestion();
+			str = db.getQuestion(q_id, q_type, true);
+
+			questionTxt.text = str[0];
+			answer = str[1];
+
+			cqs_setButtons(answer);
+			active = true;
+
+			result.text = "";
+		}
+		else if (index < 5 || !toNext)
+			result.text = "Devi prima rispondere correttamente alla domanda!";
+		else if (toNext)
+		{
+			cqs_next.onClick.RemoveAllListeners();
+			GO.SetActive(false);
+
+			questionTxt.text = "Hai completato le domande! Torna al menù";
+
+			result.text = "";
+
+			if (collect)
+			{
+				db.updateStat("CQSentences", "LastError", errorCount.ToString(), player);
+				db.updateStat("CQSentences", "LastTime", mainTimer.ToString(), player);
+				db.updateStat("CQSentences", "TotalTime", (float.Parse(db.getStat("CQSentences", "TotalTime", player)) + mainTimer).ToString(), player);
+				db.addStat(player, "CQSentences", DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss").ToString(), wrongAnsw.ToString(), errorCount.ToString(), (5 - wrongAnsw).ToString(), mainTimer.ToString(), "0");
+
+			}
+
+			btnMenu.transform.position = new Vector3(Screen.width / 2, Screen.height / 2 - 30f, 0f);
+		}
+	}
+
 
     //generic
 	int getNewQuestion()

@@ -200,6 +200,18 @@ public class MainMenu : MonoBehaviour {
 		PlayerPrefs.SetString("choice", "DoubleSentences");
 		db.choice = "DoubleSentences";
 	}
+	public void HSentences_load()
+	{
+		SceneManager.LoadScene("3. QuestionTab");
+		PlayerPrefs.SetString("choice", "HSentences");
+		db.choice = "HSentences";
+	}
+	public void CQSentences_load()
+	{
+		SceneManager.LoadScene("3. QuestionTab");
+		PlayerPrefs.SetString("choice", "CQSentences");
+		db.choice = "CQSentences";
+	}
 
 	//public void menuSelection(int moveTo)
     //{

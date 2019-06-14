@@ -65,7 +65,8 @@ public class StatsManager : MonoBehaviour {
     public Button LegendButtonsAudio;
 
     int maxpage = 2;
-    int page;
+	int page;
+	int holdPage;
     int scene;
     int rows;
     int detPages;
@@ -279,11 +280,8 @@ public class StatsManager : MonoBehaviour {
             case 1:
                 {
 					StatScrollView.gameObject.SetActive(true);
-					StatScrollView.GetComponentInChildren<ScrollRect>().verticalNormalizedPosition = 1f;
-					StatScrollbar.GetComponent<Scrollbar>().interactable = false;
-					StatScrollbar.transform.GetChild(0).GetChild(0).gameObject.SetActive(false);
-                    MiniGameButton[5].gameObject.SetActive(false);
-					MiniGameButton[6].gameObject.SetActive(false);
+					StatScrollbar.GetComponent<Scrollbar>().interactable = true;
+					StatScrollbar.transform.GetChild(0).GetChild(0).gameObject.SetActive(true);
 					MiniGameButton[7].gameObject.SetActive(false);
                     
                     MiniGameButton[0].gameObject.SetActive(true);
@@ -291,18 +289,24 @@ public class StatsManager : MonoBehaviour {
                     MiniGameButton[2].gameObject.SetActive(true);
                     MiniGameButton[3].gameObject.SetActive(true);
 					MiniGameButton[4].gameObject.SetActive(true);
+					MiniGameButton[5].gameObject.SetActive(true);
+					MiniGameButton[6].gameObject.SetActive(true);
 
                     MiniGameButton[0].onClick.RemoveAllListeners();
                     MiniGameButton[1].onClick.RemoveAllListeners();
                     MiniGameButton[2].onClick.RemoveAllListeners();
                     MiniGameButton[3].onClick.RemoveAllListeners();
 					MiniGameButton[4].onClick.RemoveAllListeners();
+					MiniGameButton[5].onClick.RemoveAllListeners();
+					MiniGameButton[6].onClick.RemoveAllListeners();
 
                     MiniGameButton[0].onClick.AddListener(delegate { selectDetStat(5); });
 					MiniGameButton[1].onClick.AddListener(delegate { selectDetStat(14);}); //CountWords
                     MiniGameButton[2].onClick.AddListener(delegate { selectDetStat(6); });
                     MiniGameButton[3].onClick.AddListener(delegate { selectDetStat(7); });
-					MiniGameButton[4].onClick.AddListener(delegate { selectDetStat(8); });
+					MiniGameButton[4].onClick.AddListener(delegate { selectDetStat(18);}); //CQSentences
+					MiniGameButton[5].onClick.AddListener(delegate { selectDetStat(8); });
+					MiniGameButton[6].onClick.AddListener(delegate { selectDetStat(17);}); //HSentences
 
                     MacroCat.text = "Non Fonologici";
                     
@@ -324,17 +328,29 @@ public class StatsManager : MonoBehaviour {
                     GameStats3[2].text = "Tempo ultima sessione: " + (float.Parse(db.getStat("AudioGame", "LastTime", kids[statsChoice.value])).ToString("n2") + "s");
                     GameStats3[3].text = "Tempo totale giocato: " + (float.Parse(db.getStat("AudioGame", "TotalTime", kids[statsChoice.value])).ToString("n2") + "s");
 
-                    MiniGameName[3].text = "Scambio Grafema CU-QU: ";
+                    MiniGameName[3].text = "Scambio Grafema CU-QU Parole: ";
                     GameStats4[0].text = "Errori ultima sessione: " + db.getStat("CQGame", "LastError", kids[statsChoice.value]);
                     GameStats4[1].text = "Tempo ultima sessione: " + (float.Parse(db.getStat("CQGame", "LastTime", kids[statsChoice.value])).ToString("n2") + "s");
                     GameStats4[2].text = "Tempo totale giocato: " + (float.Parse(db.getStat("CQGame", "TotalTime", kids[statsChoice.value])).ToString("n2") + "s");
                     GameStats4[3].text = "";
 
-					MiniGameName[4].text = "Omissione/Aggiunta 'H': ";
-					GameStats5[0].text = "Errori ultima sessione: " + db.getStat("HGame", "LastError", kids[statsChoice.value]);
-					GameStats5[1].text = "Tempo ultima sessione: " + (float.Parse(db.getStat("HGame", "LastTime", kids[statsChoice.value])).ToString("n2") + "s");
-					GameStats5[2].text = "Tempo totale giocato: " + (float.Parse(db.getStat("HGame", "TotalTime", kids[statsChoice.value])).ToString("n2") + "s");
+					MiniGameName[4].text = "Scambio Grafema CU-QU Frasi: ";
+					GameStats5[0].text = "Errori ultima sessione: " + db.getStat("CQSentences", "LastError", kids[statsChoice.value]);
+					GameStats5[1].text = "Tempo ultima sessione: " + (float.Parse(db.getStat("CQSentences", "LastTime", kids[statsChoice.value])).ToString("n2") + "s");
+					GameStats5[2].text = "Tempo totale giocato: " + (float.Parse(db.getStat("CQSentences", "TotalTime", kids[statsChoice.value])).ToString("n2") + "s");
 					GameStats5[3].text = "";
+
+					MiniGameName[5].text = "Omissione/Aggiunta 'H' Parole: ";
+					GameStats6[0].text = "Errori ultima sessione: " + db.getStat("HGame", "LastError", kids[statsChoice.value]);
+					GameStats6[1].text = "Tempo ultima sessione: " + (float.Parse(db.getStat("HGame", "LastTime", kids[statsChoice.value])).ToString("n2") + "s");
+					GameStats6[2].text = "Tempo totale giocato: " + (float.Parse(db.getStat("HGame", "TotalTime", kids[statsChoice.value])).ToString("n2") + "s");
+					GameStats6[3].text = "";
+
+					MiniGameName[6].text = "Omissione/Aggiunta 'H' Frasi: ";
+					GameStats7[0].text = "Errori ultima sessione: " + db.getStat("HSentences", "LastError", kids[statsChoice.value]);
+					GameStats7[1].text = "Tempo ultima sessione: " + (float.Parse(db.getStat("HSentences", "LastTime", kids[statsChoice.value])).ToString("n2") + "s");
+					GameStats7[2].text = "Tempo totale giocato: " + (float.Parse(db.getStat("HSentences", "TotalTime", kids[statsChoice.value])).ToString("n2") + "s");
+					GameStats7[3].text = "";
 
                     break;
                 }
@@ -588,6 +604,7 @@ public class StatsManager : MonoBehaviour {
     // DETAILED STATS
     void backDet()
     {
+		page = holdPage;
         statView = true;
         BackStats.onClick.RemoveAllListeners();
         BackStats.onClick.AddListener(CloseStats);
@@ -783,13 +800,13 @@ public class StatsManager : MonoBehaviour {
                 }
             case 7:
                 {
-                    MacroCat.text = "Scambio Grafema CU-QU";
+                    MacroCat.text = "Scambio Grafema CU-QU Parole";
                     DetStat(kidN, "CQGame");
                     break;
                 }
             case 8:
                 {
-                    MacroCat.text = "Omissione/Aggiunta 'H'";
+                    MacroCat.text = "Omissione/Aggiunta 'H' Parole";
                     DetStat(kidN, "HGame");
                     break;
                 }
@@ -841,6 +858,18 @@ public class StatsManager : MonoBehaviour {
 					DetStat(kidN, "DoubleSentences");
 					break;
 				}
+			case 17:
+				{
+				MacroCat.text = "Omissione/Aggiunta 'H' Frasi";
+					DetStat(kidN, "HSentences");
+					break;
+				}
+			case 18:
+				{
+					MacroCat.text = "Scambio Grafema CU-QU Frasi";
+					DetStat(kidN, "CQSentences");
+					break;
+				}
         }
         //setBars();
     }
@@ -860,6 +889,7 @@ public class StatsManager : MonoBehaviour {
         if (rows < 1)
         {
             alertDet.gameObject.SetActive(true);
+			holdPage = page;
             return;
         }
 
@@ -868,6 +898,7 @@ public class StatsManager : MonoBehaviour {
         detPages = (rows/5);
         detLastPage = (rows%5);
         if(detLastPage == 0) --detPages;
+		holdPage = page;
         page = 0;
         
         detailedStats = new string[rows, 6];

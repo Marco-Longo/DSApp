@@ -22,6 +22,8 @@ TagManager:
   - CountWords
   - AccentWords
   - DoubleSentences
+  - HSentences
+  - CQSentences
   layers:
   - Default
   - TransparentFX
