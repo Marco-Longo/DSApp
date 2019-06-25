@@ -1648,11 +1648,23 @@ public class QuestionManager : MonoBehaviour {
 			gc_letters [i].text = "";
 	}
 
+	public bool gc_isAnswer(string ans, string s)
+	{
+		string[] wordList = ans.Split ('+');
+			
+		foreach(string word in wordList)
+			if(word == s.ToUpper())
+				return true;
+		return false;
+	}
+
 	public void gc_checkResult()
 	{
 		gc_answer.text = checkSpace(gc_answer.text);
 
-		if (String.Equals (gc_answer.text, answer, StringComparison.OrdinalIgnoreCase)) {
+		//if (String.Equals (gc_answer.text, answer, StringComparison.OrdinalIgnoreCase)) {
+		if (gc_isAnswer(answer, gc_answer.text.ToUpper())) 
+		{
 			result.text = "Corretto!";
 			errorTmp = 0;
 
@@ -1678,7 +1690,7 @@ public class QuestionManager : MonoBehaviour {
 			return;
 		}
 
-		result.text = "La parola corretta era:\n" + answer;
+		result.text = "La parola corretta era:\n" + answer.Replace("+", ", oppure ");
 		recordTime();
 		errorCount++;
 		wrongAnsw++;
