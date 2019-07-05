@@ -2102,9 +2102,8 @@ public class QuestionManager : MonoBehaviour {
 
 	public void si_textToSpeech(int i)
 	{
-		Debug.Log ("Play track " + i);
-		//si_audio.GetComponent<AudioSource> ().clip = si_clips [i];
-		//si_audio.GetComponent<AudioSource> ().Play ();
+		si_audio.GetComponent<AudioSource> ().clip = si_clips [i-1];
+		si_audio.GetComponent<AudioSource> ().Play ();
 	}
 
 	public void si_checkResult()

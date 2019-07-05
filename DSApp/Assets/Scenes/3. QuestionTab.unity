@@ -17416,7 +17416,12 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 2f24c2b2efad9524199197e1cff73406, type: 3}
   si_correct: {fileID: 21300000, guid: 114c71453b205c745b9d8f9b05cb4383, type: 3}
   si_wrong: {fileID: 21300000, guid: d9255a5082bdaa5448b73a748ea9ecf4, type: 3}
-  si_clips: []
+  si_clips:
+  - {fileID: 8300000, guid: c0a65ac5fc3d77f43ab8171f7514db98, type: 3}
+  - {fileID: 8300000, guid: 8bf665f4ce3b6344389ac28706f9ee96, type: 3}
+  - {fileID: 8300000, guid: 5904f78483fc834489ee52cad3d07109, type: 3}
+  - {fileID: 8300000, guid: cc394dc5920370740a22e6b41dde1fc9, type: 3}
+  - {fileID: 8300000, guid: 9b2b9891561bffa4c93f62945aac7364, type: 3}
   cw_next: {fileID: 1015226835}
   cw_send: {fileID: 1987671608}
   cw_answerText: {fileID: 826641495}
